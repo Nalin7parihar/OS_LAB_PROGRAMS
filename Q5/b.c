@@ -1,34 +1,74 @@
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <fcntl.h>
-#define BUFFER_SIZE 30
+
+typedef struct
+{
+        int pid;
+        int AT;
+        int BT;
+        int CT;
+        int TAT;
+        int WT;
+} process;
+
+void fcfs(process p[], int n)
+{
+        int et = p[0].AT, totW = 0, totT = 0;
+        float avgW = 0, avgT = 0;
+        printf("\nGant chart:\n");
+        for (int i = 0; i < n; i++)
+        {
+                if (et < p[i].AT)
+                        et = p[i].AT;
+                p[i].WT = et - p[i].AT;
+                et += p[i].BT;
+                p[i].TAT = et - p[i].AT;
+                p[i].CT = et;
+                printf("|(%d) P%d (%d)", et - p[i].BT, p[i].pid, et);
+        }
+        printf("\n");
+        printf("Observation Table\nPID\tAT\tBT\tCT\tTAT\tWT\n");
+        for (int i = 0; i < n; i++)
+        {
+                process t = p[i];
+                printf("\n%d\t%d\t%d\t%d\t%d\t%d\n", t.pid, t.AT, t.BT, t.CT, t.TAT, t.WT);
+                totT += t.TAT;
+                totW += t.WT;
+        }
+        avgT = (totT) / n;
+        avgW = (totW) / n;
+        printf("\nAverage waiting time: %.2f\n\nAverage turn around time: %.2f\n", avgW, avgT);
+}
+
 int main()
 {
-        int fd, n;
-        char buffer[BUFFER_SIZE];
-        fd = open("testFile.txt", O_RDWR);
-        printf("File description is %d\n", fd);
-        if (!(fd + 1))
+        int n;
+        printf("Enter the number of processes: ");
+        scanf("%d", &n);
+        process *processes = (process *)malloc(n * sizeof(process));
+        for (int i = 0; i < n; i++)
         {
-                printf("\nFailed to open file.\n");
-                exit(1);
+                printf("\nProcess %d\n", i + 1);
+                printf("Enter arrival time: ");
+                scanf("%d", &processes[i].AT);
+                printf("Enter burst time: ");
+                scanf("%d", &processes[i].BT);
+                processes[i].pid = i + 1;
+                printf("\n");
         }
-        printf("Reading first 10 characters from the file.\n");
-        n = read(fd, buffer, 10);
-        write(1, buffer, n);
-        printf("\nSkipping 5 characters from current position in the file:\n");
-        lseek(fd, 5, SEEK_CUR);
-        n = read(fd, buffer, 10);
-        write(1, buffer, n);
-        printf("\nGoing to 5th last character in the file:\n");
-        lseek(fd, -5, SEEK_END);
-        n = read(fd, buffer, 7);
-        write(1, buffer, n);
-        printf("\nGoing to 3rd character in the file:\n");
-        lseek(fd, 3, SEEK_SET);
-        n = read(fd, buffer, 5);
-        write(1, buffer, n);
-        printf("\n");
+        for (int i = 0; i < n - 1; i++)
+        {
+                for (int j = 0; j < n - i - 1; j++)
+                {
+                        if (processes[j].AT > processes[j + 1].AT)
+                        {
+                                process temp = processes[j];
+                                processes[j] = processes[j + 1];
+                                processes[j + 1] = temp;
+                        }
+                }
+        }
+        fcfs(processes, n);
+        free(processes);
         return 0;
 }
