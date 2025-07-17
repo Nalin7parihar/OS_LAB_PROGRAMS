@@ -15,7 +15,7 @@ void fcfs(process p[], int n)
 {
         int et = p[0].AT, totW = 0, totT = 0;
         float avgW = 0, avgT = 0;
-        printf("\nGantt chart:\n");
+        printf("\nGant chart:\n");
         for (int i = 0; i < n; i++)
         {
                 if (et < p[i].AT)
@@ -24,21 +24,20 @@ void fcfs(process p[], int n)
                 et += p[i].BT;
                 p[i].TAT = et - p[i].AT;
                 p[i].CT = et;
-                printf("| (%d) P%d (%d) ", et - p[i].BT, p[i].pid, et);
+                printf("|(%d) P%d (%d)", et - p[i].BT, p[i].pid, et);
         }
-        printf("|\n");
-        printf("\nObservation Table:\nPID\tAT\tBT\tCT\tTAT\tWT\n");
+        printf("\n");
+        printf("Observation Table\nPID\tAT\tBT\tCT\tTAT\tWT\n");
         for (int i = 0; i < n; i++)
         {
                 process t = p[i];
-                printf("%d\t%d\t%d\t%d\t%d\t%d\n", t.pid, t.AT, t.BT, t.CT, t.TAT, t.WT);
+                printf("\n%d\t%d\t%d\t%d\t%d\t%d\n", t.pid, t.AT, t.BT, t.CT, t.TAT, t.WT);
                 totT += t.TAT;
                 totW += t.WT;
         }
-        avgT = (float)totT / n;
-        avgW = (float)totW / n;
-        printf("\nAverage waiting time: %.2f\n", avgW);
-        printf("Average turn around time: %.2f\n", avgT);
+        avgT = (totT) / n;
+        avgW = (totW) / n;
+        printf("\nAverage waiting time: %.2f\n\nAverage turn around time: %.2f\n", avgW, avgT);
 }
 
 int main()

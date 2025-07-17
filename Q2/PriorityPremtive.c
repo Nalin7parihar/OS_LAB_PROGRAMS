@@ -19,6 +19,7 @@ void priorityPreemptiveScheduling(Process processes[], int n)
 {
     int currentTime = 0, completed = 0;
     float totalWT = 0, totalTAT = 0;
+    int lastFinishTime = -1;
     printf("Gantt Chart:\n");
 
     while (completed != n)
@@ -26,33 +27,35 @@ void priorityPreemptiveScheduling(Process processes[], int n)
         int idx = -1;
         int highestPriority = INT_MAX;
 
-        // Find the process with highest priority (lowest priority number)
         for (int i = 0; i < n; i++)
         {
             if (processes[i].arrivalTime <= currentTime && processes[i].remainingTime > 0)
             {
-                if (processes[i].priority < highestPriority ||
-                    (processes[i].priority == highestPriority && processes[i].arrivalTime < processes[idx].arrivalTime))
+                if (processes[i].priority < highestPriority)
                 {
                     highestPriority = processes[i].priority;
                     idx = i;
+                }
+                if (processes[i].priority == highestPriority)
+                {
+                    if (processes[i].arrivalTime < processes[idx].arrivalTime)
+                    {
+                        idx = i;
+                    }
                 }
             }
         }
 
         if (idx != -1)
         {
-            // Set start time if this is the first time the process runs
             if (processes[idx].remainingTime == processes[idx].burstTime)
             {
                 processes[idx].startTime = currentTime;
             }
 
-            // Execute the process for 1 time unit
             processes[idx].remainingTime--;
             currentTime++;
 
-            // Check if process is completed
             if (processes[idx].remainingTime == 0)
             {
                 processes[idx].finishTime = currentTime;
@@ -62,18 +65,17 @@ void priorityPreemptiveScheduling(Process processes[], int n)
                 totalWT += processes[idx].waitingTime;
                 totalTAT += processes[idx].turnAroundTime;
                 completed++;
+                lastFinishTime = processes[idx].finishTime;
             }
-
-            printf("| (%d) P%d (%d) ", currentTime - 1, processes[idx].pid, currentTime);
         }
         else
         {
-            // No process is ready, CPU is idle
+            // processes[idx].startTime++;
             currentTime++;
-            printf("| (%d) IDLE (%d) ", currentTime - 1, currentTime);
         }
+        printf("| (%d)  P%d  (%d)  ", currentTime - 1, processes[idx].pid, currentTime);
     }
-    printf("|\n\n");
+    printf(" | \n\n");
 
     printf("Observation Table:\nPID\tAT\tBT\tPRI\tST\tFT\tWT\tTAT\n");
     for (int i = 0; i < n; i++)
@@ -105,7 +107,7 @@ int main()
         scanf("%d", &processes[i].priority);
         processes[i].pid = i + 1;
         processes[i].remainingTime = processes[i].burstTime;
-        processes[i].startTime = -1; // Initialize to -1 to indicate not started
+        processes[i].startTime = 0;
         processes[i].finishTime = 0;
     }
     printf("\n");

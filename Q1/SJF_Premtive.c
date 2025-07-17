@@ -18,11 +18,10 @@ typedef struct
 void calculate_time(Process *processes, int n)
 {
         int currTime = 0, completed_processes = 0, prev = -1;
-        printf("\nGantt Chart:\n");
 
         while (completed_processes < n)
         {
-                int sji = -1, srt = INT_MAX;
+                int sji = -1, srt = INT_MAX, art = INT_MAX;
 
                 for (int i = 0; i < n; i++)
                 {
@@ -35,8 +34,9 @@ void calculate_time(Process *processes, int n)
                                 }
                                 else if (processes[i].remainingTime == srt)
                                 {
-                                        if (processes[i].arrivalTime < processes[sji].arrivalTime)
+                                        if (processes[i].arrivalTime < art)
                                         {
+                                                srt = processes[i].remainingTime;
                                                 sji = i;
                                         }
                                 }
@@ -47,6 +47,7 @@ void calculate_time(Process *processes, int n)
                         currTime++;
                 else
                 {
+                        art = processes[sji].arrivalTime;
                         if (prev != sji)
                         {
                                 processes[sji].startTime = (processes[sji].startTime == -1) ? currTime : processes[sji].startTime;
@@ -61,11 +62,12 @@ void calculate_time(Process *processes, int n)
                                 processes[sji].TATime = processes[sji].finishTime - processes[sji].arrivalTime;
                                 processes[sji].completed = 1;
                                 completed_processes++;
+                                art = INT_MAX;
                         }
-                        printf("| (%d) P%d (%d) ", currTime - 1, processes[sji].pid, currTime);
+                        printf("| (%d)  P%d  (%d)  ", currTime - 1, processes[sji].pid, currTime);
                 }
         }
-        printf("|\n");
+        printf("| ");
 }
 
 void printInfo(Process *processes, int n)
@@ -95,7 +97,7 @@ void main()
         Process *processes = (Process *)malloc(n * sizeof(Process));
         for (int i = 0; i < n; i++)
         {
-                printf("Enter arrival time and burst time for process %d : ", i + 1);
+                printf("Enter arrival time and burst time for processe %d : ", i + 1);
                 processes[i].pid = i + 1;
                 processes[i].completed = 0;
                 processes[i].startTime = -1;
