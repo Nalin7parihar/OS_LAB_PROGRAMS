@@ -13,12 +13,13 @@ typedef struct
     int finishTime;     // Finish time
     int waitingTime;    // Waiting time
     int turnAroundTime; // Turnaround time
+    int responseTime;   // Response time
 } Process;
 
 void priorityPreemptiveScheduling(Process processes[], int n)
 {
     int currentTime = 0, completed = 0;
-    float totalWT = 0, totalTAT = 0;
+    float totalWT = 0, totalTAT = 0, totalRT = 0;
     int lastFinishTime = -1;
     printf("Gantt Chart:\n");
 
@@ -51,6 +52,7 @@ void priorityPreemptiveScheduling(Process processes[], int n)
             if (processes[idx].remainingTime == processes[idx].burstTime)
             {
                 processes[idx].startTime = currentTime;
+                processes[idx].responseTime = currentTime - processes[idx].arrivalTime;
             }
 
             processes[idx].remainingTime--;
@@ -64,6 +66,7 @@ void priorityPreemptiveScheduling(Process processes[], int n)
 
                 totalWT += processes[idx].waitingTime;
                 totalTAT += processes[idx].turnAroundTime;
+                totalRT += processes[idx].responseTime;
                 completed++;
                 lastFinishTime = processes[idx].finishTime;
             }
@@ -77,15 +80,16 @@ void priorityPreemptiveScheduling(Process processes[], int n)
     }
     printf(" | \n\n");
 
-    printf("Observation Table:\nPID\tAT\tBT\tPRI\tST\tFT\tWT\tTAT\n");
+    printf("Observation Table:\nPID\tAT\tBT\tPRI\tST\tFT\tWT\tTAT\tRT\n");
     for (int i = 0; i < n; i++)
     {
-        printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n", processes[i].pid, processes[i].arrivalTime, processes[i].burstTime,
-               processes[i].priority, processes[i].startTime, processes[i].finishTime, processes[i].waitingTime, processes[i].turnAroundTime);
+        printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n", processes[i].pid, processes[i].arrivalTime, processes[i].burstTime,
+               processes[i].priority, processes[i].startTime, processes[i].finishTime, processes[i].waitingTime, processes[i].turnAroundTime, processes[i].responseTime);
     }
 
     printf("\nAverage Waiting Time: %.2f\n", totalWT / n);
     printf("Average Turnaround Time: %.2f\n", totalTAT / n);
+    printf("Average Response Time: %.2f\n", totalRT / n);
 }
 
 int main()
@@ -109,6 +113,7 @@ int main()
         processes[i].remainingTime = processes[i].burstTime;
         processes[i].startTime = 0;
         processes[i].finishTime = 0;
+        processes[i].responseTime = -1;
     }
     printf("\n");
 

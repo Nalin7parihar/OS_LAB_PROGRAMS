@@ -11,6 +11,7 @@ typedef struct
     int finishTime;
     int waitTime;
     int TATime;
+    int responseTime;
     int remainingTime;
     int completed;
 } Process;
@@ -39,6 +40,7 @@ void calculate_time(Process *processes, int n)
         {
             processes[sji].startTime = currTime;
             processes[sji].finishTime = currTime + processes[sji].burstTime;
+            processes[sji].responseTime = processes[sji].startTime - processes[sji].arrivalTime;
             processes[sji].waitTime = processes[sji].startTime - processes[sji].arrivalTime;
             processes[sji].TATime = processes[sji].finishTime - processes[sji].arrivalTime;
             processes[sji].completed = 1;
@@ -54,19 +56,24 @@ void printInfo(Process *processes, int n)
 {
     float avgWT = 0;
     float avgTAT = 0;
+    float avgRT = 0;
     int totWT = 0;
     int totTAT = 0;
-    printf("\n\nObservation Table:\nPID\tAT\tBT\tST\tFT\tWT\tTAT\n");
+    int totRT = 0;
+    printf("\n\nObservation Table:\nPID\tAT\tBT\tST\tFT\tWT\tTAT\tRT\n");
     for (int i = 0; i < n; i++)
     {
-        printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\n", processes[i].pid, processes[i].arrivalTime, processes[i].burstTime, processes[i].startTime, processes[i].finishTime, processes[i].waitTime, processes[i].TATime);
+        printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n", processes[i].pid, processes[i].arrivalTime, processes[i].burstTime, processes[i].startTime, processes[i].finishTime, processes[i].waitTime, processes[i].TATime, processes[i].responseTime);
         totTAT += processes[i].TATime;
         totWT += processes[i].waitTime;
+        totRT += processes[i].responseTime;
     }
     avgTAT = (float)totTAT / n;
     avgWT = (float)totWT / n;
+    avgRT = (float)totRT / n;
     printf("\nAverage Waiting Time: %.2f\n", avgWT);
-    printf("\nAverage Turn Around Time: %.2f\n", avgTAT);
+    printf("Average Turn Around Time: %.2f\n", avgTAT);
+    printf("Average Response Time: %.2f\n", avgRT);
 }
 
 void main()
